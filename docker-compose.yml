@@ -1,0 +1,11 @@
+services:
+  forensic-marking:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env          # .env.example 을 복사해 키를 채운다
+    volumes:
+      - wm-data:/data
+volumes:
+  wm-data:

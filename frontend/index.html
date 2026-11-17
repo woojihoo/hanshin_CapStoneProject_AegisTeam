@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포렌식 마킹 관제 포털</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>포렌식 마킹 관제 포털</h1>
+    <p class="sub">가명 토큰 기반 비가시성 워터마크 · 유출 역추적</p>
+  </div>
+  <div class="key">
+    <label for="apiKey">관리자 API 키</label>
+    <input id="apiKey" type="password" placeholder="X-API-Key" autocomplete="off">
+    <span id="health" class="pill">확인 중</span>
+  </div>
+</header>
+
+<nav>
+  <button data-tab="docs" class="active">문서 등록 · 배포</button>
+  <button data-tab="trace">유출 역추적</button>
+  <button data-tab="audit">감사 로그</button>
+</nav>
+
+<main>
+  <section id="tab-docs">
+    <div class="card">
+      <h2>원본 등록</h2>
+      <form id="uploadForm" class="row">
+        <input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg,.bmp,.webp" required>
+        <input type="text" name="title" placeholder="제목 (선택)">
+        <select name="scenario">
+          <option value="document">기업 문서 (사용자별 토큰)</option>
+          <option value="c2c">중고거래 사진 (판매글별 토큰)</option>
+        </select>
+        <button type="submit">등록</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>등록된 원본</h2>
+      <table id="docTable"><thead><tr>
+        <th>제목</th><th>유형</th><th>페이지</th><th>발급 수</th><th>등록 시각</th><th></th>
+      </tr></thead><tbody></tbody></table>
+      <p id="docEmpty" class="muted">등록된 원본이 없습니다.</p>
+    </div>
+    <div class="card hidden" id="issueCard">
+      <h2>배포본 발급 — <span id="issueTitle"></span></h2>
+      <p class="muted">입력한 수령자 정보는 AES-GCM으로 암호화되어 해시 체인 발급 원장에만 저장되고, 파일에는 무작위 24비트 토큰만 삽입됩니다.</p>
+      <form id="issueForm" class="row">
+        <input name="subject_id" placeholder="사번 / 판매글 ID (필수)" required>
+        <input name="subject_name" placeholder="이름 (선택)">
+        <input name="department" placeholder="부서 (선택)">
+        <input name="note" placeholder="비고 (선택)">
+        <button type="submit">발급 후 내려받기</button>
+        <button type="button" class="ghost" id="issueCancel">닫기</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-trace" class="hidden">
+    <div class="card">
+      <h2>유출 의심 이미지 분석</h2>
+      <form id="traceForm" class="row">
+        <input type="file" id="traceFile" accept="image/*" required>
+        <label class="check"><input type="checkbox" id="deep"> 정밀 탐색 (배율이 바뀐 사본, 느림)</label>
+        <button type="submit">역추적 실행</button>
+      </form>
+      <p class="muted">촬영본에서 페이지가 자동 검출되지 않으면, 미리보기에서 페이지의 네 꼭짓점을
+        <b>좌상 → 우상 → 우하 → 좌하</b> 순서로 클릭하세요. <button type="button" class="ghost small" id="resetPts">꼭짓점 초기화</button></p>
+      <canvas id="preview" class="hidden"></canvas>
+    </div>
+    <div class="card hidden" id="resultCard">
+      <h2>분석 결과</h2>
+      <div id="resultBody"></div>
+      <form id="revealForm" class="row hidden">
+        <input id="reason" placeholder="신원 열람 사유 (5자 이상, 감사 로그에 기록됨)" required minlength="5">
+        <button type="submit" class="danger">신원 열람</button>
+      </form>
+      <div id="revealBody"></div>
+    </div>
+    <div class="card">
+      <h2>분석 이력</h2>
+      <table id="traceTable"><thead><tr>
+        <th>시각</th><th>판정</th><th>반복 수</th><th>BER</th><th>토큰 참조</th><th>동기 점수</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <section id="tab-audit" class="hidden">
+    <div class="card">
+      <h2>감사 로그 <button type="button" class="ghost small" id="verifyBtn">해시 체인 검증 (/verify)</button>
+        <span id="verifyOut" class="pill hidden"></span></h2>
+      <table id="auditTable"><thead><tr>
+        <th>#</th><th>시각 (UTC)</th><th>행위자</th><th>행위</th><th>상세</th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+  </section>
+</main>
+<div id="toast" class="hidden" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>

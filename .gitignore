@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# 비밀 키·운영 데이터 (절대 올리지 않음)
+.env
+data/
+
+# 로컬 보관용 이전 버전 (48비트 토큰·RS 방식)
+_archive/
+
+# macOS
+.DS_Store
